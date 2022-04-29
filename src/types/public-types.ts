@@ -14,6 +14,8 @@ export interface Task {
   name: string;
   start: Date;
   end: Date;
+  startCap: Date;
+  endCap: Date;
   /**
    * From 0 to 100
    */
@@ -29,6 +31,7 @@ export interface Task {
   dependencies?: string[];
   hideChildren?: boolean;
   displayOrder?: number;
+  isBarExpandable?: boolean;
 }
 
 export interface EventOption {
@@ -94,6 +97,7 @@ export interface StylingOption {
    */
   barFill?: number;
   barProgressColor?: string;
+  barNoCapBackgroundColor?: string;
   barProgressSelectedColor?: string;
   barBackgroundColor?: string;
   barBackgroundSelectedColor?: string;
@@ -106,6 +110,10 @@ export interface StylingOption {
   arrowColor?: string;
   arrowIndent?: number;
   todayColor?: string;
+  wcOverlapColor?: string,
+  holidayColor?: string,
+  plannedDownTimeColor?: string,
+  overtimeColor?: string,
   TooltipContent?: React.FC<{
     task: Task;
     fontSize: string;
@@ -133,6 +141,16 @@ export interface StylingOption {
   }>;
 }
 
+export type OffDateType = "holiday" | "overtime" | "plannedDownTime" | "wcOverlap";
+
+export interface OffDate {
+  type: OffDateType;
+  start: Date;
+  end: Date;
+  wcId?: string;
+}
+
 export interface GanttProps extends EventOption, DisplayOption, StylingOption {
   tasks: Task[];
+  offDates: OffDate[];
 }

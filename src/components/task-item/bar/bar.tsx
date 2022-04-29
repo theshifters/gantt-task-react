@@ -9,6 +9,7 @@ import styles from "./bar.module.css";
 export const Bar: React.FC<TaskItemProps> = ({
   task,
   isProgressChangeable,
+                                               isBarExpandable,
   isDateChangeable,
   rtl,
   onEventStart,
@@ -20,10 +21,14 @@ export const Bar: React.FC<TaskItemProps> = ({
     task.height
   );
   const handleHeight = task.height - 2;
+
   return (
     <g className={styles.barWrapper} tabIndex={0}>
       <BarDisplay
-        x={task.x1}
+        x1={task.x1}
+        x2={task.x2}
+        xCap1={task.xCap1}
+        xCap2={task.xCap2}
         y={task.y}
         width={task.x2 - task.x1}
         height={task.height}
@@ -37,7 +42,7 @@ export const Bar: React.FC<TaskItemProps> = ({
         }}
       />
       <g className="handleGroup">
-        {isDateChangeable && (
+        {isBarExpandable && (
           <g>
             {/* left */}
             <BarDateHandle

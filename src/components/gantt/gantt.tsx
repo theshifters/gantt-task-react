@@ -38,6 +38,7 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
   barProgressColor = "#a3a3ff",
   barProgressSelectedColor = "#8282f5",
   barBackgroundColor = "#b8c2cc",
+  barNoCapBackgroundColor = "#1ac436",
   barBackgroundSelectedColor = "#aeb8c2",
   projectProgressColor = "#7db59a",
   projectProgressSelectedColor = "#59a985",
@@ -53,6 +54,10 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
   fontSize = "14px",
   arrowIndent = 20,
   todayColor = "rgba(252, 248, 227, 0.5)",
+  wcOverlapColor = "rgba(247, 194, 187, 1)",
+  holidayColor = "rgba(250, 214, 209, 0.5)",
+  plannedDownTimeColor = "rgba(250, 214, 209, 0.7)",
+  overtimeColor = "rgba(230, 230, 230, 1)",
   viewDate,
   TooltipContent = StandardTooltipContent,
   TaskListHeader = TaskListHeaderDefault,
@@ -63,6 +68,7 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
   onDelete,
   onSelect,
   onExpanderClick,
+                                                             offDates,
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const taskListRef = useRef<HTMLDivElement>(null);
@@ -127,6 +133,7 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
         barProgressColor,
         barProgressSelectedColor,
         barBackgroundColor,
+        barNoCapBackgroundColor,
         barBackgroundSelectedColor,
         projectProgressColor,
         projectProgressSelectedColor,
@@ -378,7 +385,13 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
     rowHeight,
     dates: dateSetup.dates,
     todayColor,
+    wcOverlapColor,
+    holidayColor,
+    plannedDownTimeColor,
+    overtimeColor,
     rtl,
+    offDates,
+    viewMode,
   };
   const calendarProps: CalendarProps = {
     dateSetup,
@@ -432,6 +445,7 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
     TaskListHeader,
     TaskListTable,
   };
+
   return (
     <div>
       <div

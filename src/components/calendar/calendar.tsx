@@ -241,21 +241,22 @@ export const Calendar: React.FC<CalendarProps> = ({
           {bottomValue}
         </text>
       );
-      if (i === 0 || date.getDate() !== dates[i - 1].getDate()) {
+
+      if (i !== dates.length - 1 && date.getDate() !== dates[i + 1].getDate()) {
         const topValue = `${getLocalDayOfWeek(
           date,
           locale,
           "long"
         )}, ${date.getDate()} ${getLocaleMonth(date, locale)}`;
-        const topPosition = (date.getHours() - 24) / 2;
+
         topValues.push(
           <TopPartOfCalendar
             key={topValue + date.getFullYear()}
             value={topValue}
-            x1Line={columnWidth * i}
+            x1Line={columnWidth * (i + 1)}
             y1Line={0}
             y2Line={topDefaultHeight}
-            xText={columnWidth * (i + topPosition)}
+            xText={(columnWidth * (i + 1)) - 720}
             yText={topDefaultHeight * 0.9}
           />
         );

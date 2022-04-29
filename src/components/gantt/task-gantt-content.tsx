@@ -58,6 +58,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
   const point = svg?.current?.createSVGPoint();
   const [xStep, setXStep] = useState(0);
   const [initEventX1Delta, setInitEventX1Delta] = useState(0);
+  const [initEventXCap1Delta, setInitEventXCap1Delta] = useState(0);
   const [isMoving, setIsMoving] = useState(false);
 
   // create xStep
@@ -88,6 +89,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
         xStep,
         timeStep,
         initEventX1Delta,
+        initEventXCap1Delta,
         rtl
       );
       if (isChanged) {
@@ -112,6 +114,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
         xStep,
         timeStep,
         initEventX1Delta,
+        initEventXCap1Delta,
         rtl
       );
 
@@ -239,6 +242,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
         svg.current.getScreenCTM()?.inverse()
       );
       setInitEventX1Delta(cursor.x - task.x1);
+      setInitEventXCap1Delta(cursor.x - task.xCap1),
       setGanttEvent({
         action,
         changedTask: task,
@@ -280,6 +284,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
               arrowIndent={arrowIndent}
               taskHeight={taskHeight}
               isProgressChangeable={!!onProgressChange && !task.isDisabled}
+              isBarExpandable={!!task.isBarExpandable}
               isDateChangeable={!!onDateChange && !task.isDisabled}
               isDelete={!task.isDisabled}
               onEventStart={handleBarEventStart}

@@ -42,12 +42,13 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
   barBackgroundSelectedColor = "#aeb8c2",
   projectProgressColor = "#7db59a",
   projectProgressSelectedColor = "#59a985",
-  projectBackgroundColor = "#fac465",
+  projectBackgroundColor = "#fabe65",
   projectBackgroundSelectedColor = "#f7bb53",
+  projectOverlapColor = "#fc2323",
   milestoneBackgroundColor = "#f1c453",
   milestoneBackgroundSelectedColor = "#f29e4c",
   rtl = false,
-  handleWidth = 8,
+  handleWidth = 0,
   timeStep = 300000,
   arrowColor = "grey",
   fontFamily = "Arial, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue",
@@ -68,7 +69,8 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
   onDelete,
   onSelect,
   onExpanderClick,
-                                                             offDates,
+  offDates,
+  overlapTasks,
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const taskListRef = useRef<HTMLDivElement>(null);
@@ -101,6 +103,8 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
   const [scrollY, setScrollY] = useState(0);
   const [scrollX, setScrollX] = useState(-1);
   const [ignoreScrollEvent, setIgnoreScrollEvent] = useState(false);
+
+  const [overlapBarTasks, setOverlapBarTasks] = useState<BarTask[]>([]);
 
   // task change events
   useEffect(() => {
@@ -139,6 +143,31 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
         projectProgressSelectedColor,
         projectBackgroundColor,
         projectBackgroundSelectedColor,
+        projectOverlapColor,
+        milestoneBackgroundColor,
+        milestoneBackgroundSelectedColor
+      )
+    );
+    setOverlapBarTasks(
+      convertToBarTasks(
+        overlapTasks,
+        newDates,
+        columnWidth,
+        rowHeight,
+        taskHeight,
+        barCornerRadius,
+        handleWidth,
+        rtl,
+        barProgressColor,
+        barProgressSelectedColor,
+        barBackgroundColor,
+        barNoCapBackgroundColor,
+        barBackgroundSelectedColor,
+        projectProgressColor,
+        projectProgressSelectedColor,
+        projectBackgroundColor,
+        projectBackgroundSelectedColor,
+        projectOverlapColor,
         milestoneBackgroundColor,
         milestoneBackgroundSelectedColor
       )
@@ -159,11 +188,13 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
     projectProgressSelectedColor,
     projectBackgroundColor,
     projectBackgroundSelectedColor,
+    projectOverlapColor,
     milestoneBackgroundColor,
     milestoneBackgroundSelectedColor,
     rtl,
     scrollX,
     onExpanderClick,
+    overlapTasks,
   ]);
 
   useEffect(() => {
@@ -425,6 +456,7 @@ export const Gantt: React.FunctionComponent<GanttProps> = ({
     onProgressChange,
     onDoubleClick,
     onDelete,
+    overlapTasks: overlapBarTasks,
   };
 
   const tableProps: TaskListProps = {

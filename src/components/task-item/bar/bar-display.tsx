@@ -46,9 +46,9 @@ export const BarDisplay: React.FC<BarDisplayProps> = ({
     return isSelected ? styles.backgroundSelectedColor : styles.backgroundColor;
   };
 
-  const getNotCapColor = () => {
+  const getNoCapColor = () => {
     return styles.noCapBackgroundColor;
-  }
+  };
 
   return (
     <g onMouseDown={onMouseDown}>
@@ -69,7 +69,7 @@ export const BarDisplay: React.FC<BarDisplayProps> = ({
         height={height}
         ry={barCornerRadius}
         rx={barCornerRadius}
-        fill={getNotCapColor()}
+        fill={getNoCapColor()}
       />
       <rect
         x={x2 - (x2 - xCap2)}
@@ -78,7 +78,7 @@ export const BarDisplay: React.FC<BarDisplayProps> = ({
         height={height}
         ry={barCornerRadius}
         rx={barCornerRadius}
-        fill={getNotCapColor()}
+        fill={getNoCapColor()}
       />
       <rect
         x={progressX}

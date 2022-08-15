@@ -20,6 +20,7 @@ export const convertToBarTasks = (
   projectProgressSelectedColor: string,
   projectBackgroundColor: string,
   projectBackgroundSelectedColor: string,
+  projectOverlapColor: string,
   milestoneBackgroundColor: string,
   milestoneBackgroundSelectedColor: string
 ) => {
@@ -49,6 +50,7 @@ export const convertToBarTasks = (
       projectProgressSelectedColor,
       projectBackgroundColor,
       projectBackgroundSelectedColor,
+      projectOverlapColor,
       milestoneBackgroundColor,
       milestoneBackgroundSelectedColor
     );
@@ -89,6 +91,7 @@ const convertToBarTask = (
   projectProgressSelectedColor: string,
   projectBackgroundColor: string,
   projectBackgroundSelectedColor: string,
+  projectOverlapColor: string,
   milestoneBackgroundColor: string,
   milestoneBackgroundSelectedColor: string
 ): BarTask => {
@@ -125,7 +128,8 @@ const convertToBarTask = (
         projectProgressSelectedColor,
         projectBackgroundColor,
         barNoCapBackgroundColor,
-        projectBackgroundSelectedColor
+        projectBackgroundSelectedColor,
+        projectOverlapColor
       );
       break;
     default:
@@ -144,7 +148,8 @@ const convertToBarTask = (
         barProgressSelectedColor,
         barBackgroundColor,
         barNoCapBackgroundColor,
-        barBackgroundSelectedColor
+        barBackgroundSelectedColor,
+        projectOverlapColor
       );
       break;
   }
@@ -167,6 +172,7 @@ const convertToBar = (
   barBackgroundColor: string,
   barNoCapBackgroundColor: string,
   barBackgroundSelectedColor: string,
+  barOverlapColor: string
 ): BarTask => {
   let x1: number;
   let x2: number;
@@ -205,6 +211,7 @@ const convertToBar = (
     backgroundSelectedColor: barBackgroundSelectedColor,
     progressColor: barProgressColor,
     progressSelectedColor: barProgressSelectedColor,
+    overlapColor: barOverlapColor,
     ...task.styles,
   };
   return {
@@ -253,6 +260,7 @@ const convertToMilestone = (
     backgroundSelectedColor: milestoneBackgroundSelectedColor,
     progressColor: "",
     progressSelectedColor: "",
+    overlapColor: "",
     ...task.styles,
   };
   return {

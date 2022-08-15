@@ -1,6 +1,6 @@
-import React, { ReactChild } from "react";
-import {OffDate, Task, ViewMode} from "../../types/public-types";
-import {addToDate, getDaysInMonth} from "../../helpers/date-helper";
+import React, { ReactChild, useMemo } from "react";
+import { OffDate, Task, ViewMode } from "../../types/public-types";
+import { addToDate, getDaysInMonth } from "../../helpers/date-helper";
 import styles from "./grid.module.css";
 
 interface TaskWidthParams {
@@ -31,13 +31,13 @@ export const GridBody: React.FC<GridBodyProps> = ({
   svgWidth,
   columnWidth,
   todayColor,
-                                                    wcOverlapColor,
-                                                    holidayColor,
-                                                    plannedDownTimeColor,
-                                                    overtimeColor,
+  wcOverlapColor,
+  holidayColor,
+  plannedDownTimeColor,
+  overtimeColor,
   rtl,
-                                                    offDates,
-                                                    viewMode,
+  offDates,
+  viewMode,
 }) => {
   let viewModeFactor = 1;
   switch (viewMode) {
@@ -54,23 +54,30 @@ export const GridBody: React.FC<GridBodyProps> = ({
       viewModeFactor = 1;
       break;
     case ViewMode.Week:
-      viewModeFactor = 1/7;
+      viewModeFactor = 1 / 7;
       break;
   }
-  const wcIds = offDates.map((it) => it.wcId!!);
-  const yWcIdMap: Record<string, { y: number, height: number }> = {};
 
-  let yTemp = 0;
+  const yWcIdMap = useMemo(() => {
+    const wcIds = Array.from(new Set(offDates.map(it => it.wcId!!)).values());
+    const yWcIdMapTemp: Record<string, { y: number; height: number }> = {};
+    let yTemp = 0;
 
-  for (const task of tasks) {
-    if (wcIds.some((wcId) => `WC${wcId}` === task.id)) {
-      const wcId = task.id
-      const tasksInProject = tasks.filter((task) => task.project === wcId)
-      yWcIdMap[wcId] = { y: yTemp, height: rowHeight * (tasksInProject.length + 1) }
+    for (const task of tasks) {
+      if (wcIds.some(wcId => `WC${wcId}` === task.id)) {
+        const wcId = task.id;
+        const tasksInProject = tasks.filter(task => task.project === wcId);
+        yWcIdMapTemp[wcId] = {
+          y: yTemp,
+          height: rowHeight * (tasksInProject.length + 1),
+        };
+      }
+
+      yTemp += rowHeight;
     }
 
-    yTemp += rowHeight;
-  }
+    return yWcIdMapTemp;
+  }, [offDates]);
 
   let y = 0;
   const gridRows: ReactChild[] = [];
@@ -171,10 +178,13 @@ export const GridBody: React.FC<GridBodyProps> = ({
     }
 
     // offDates
-    const totalMsInOneDay = 86400000
-    const startOfTodayMs = date.getTime()
+    const totalMsInOneDay = 86400000;
+    const startOfTodayMs = date.getTime();
     const daysInMonth = getDaysInMonth(date.getMonth(), date.getFullYear());
-    const columnWidthViewModeFactor = viewMode === "Month" ? columnWidth * (1 / daysInMonth) : columnWidth * viewModeFactor;
+    const columnWidthViewModeFactor =
+      viewMode === "Month"
+        ? columnWidth * (1 / daysInMonth)
+        : columnWidth * viewModeFactor;
 
     for (let j = 0; j < offDates.length; j++) {
       const offDate = offDates[j];
@@ -185,71 +195,113 @@ export const GridBody: React.FC<GridBodyProps> = ({
       const freeMs = totalMsInOneDay - taskMs;
       const freeWidth = (freeMs / totalMsInOneDay) * columnWidthViewModeFactor;
       const startToOffStartMsInOneDay = offStartMs - startOfTodayMs;
-      const toAddTickX = (startToOffStartMsInOneDay / totalMsInOneDay) * columnWidthViewModeFactor;
+      const toAddTickX =
+        (startToOffStartMsInOneDay / totalMsInOneDay) *
+        columnWidthViewModeFactor;
 
       if (!rtl) {
-        if (viewMode === "Hour" &&
+        if (
+          viewMode === "Hour" &&
           offDate.type === "overtime" &&
           dates[i].getDate() === dates[0].getDate() &&
           dates[i].getMonth() === dates[0].getMonth() &&
-          dates[i].getFullYear() === dates[0].getFullYear()) {
-
+          dates[i].getFullYear() === dates[0].getFullYear()
+        ) {
           const firstDateOfGantt = dates[0];
-          const countDateSameAsFirstDateOfGantt = dates.filter((it) =>
-            it.getDate() === firstDateOfGantt.getDate() &&
-            it.getMonth() === firstDateOfGantt.getMonth() &&
-            it.getFullYear() === firstDateOfGantt.getFullYear()).length;
-          const nextDateOfFirstDateOfGantt = dates[countDateSameAsFirstDateOfGantt];
+          const countDateSameAsFirstDateOfGantt = dates.filter(
+            it =>
+              it.getDate() === firstDateOfGantt.getDate() &&
+              it.getMonth() === firstDateOfGantt.getMonth() &&
+              it.getFullYear() === firstDateOfGantt.getFullYear()
+          ).length;
+          const nextDateOfFirstDateOfGantt =
+            dates[countDateSameAsFirstDateOfGantt];
 
-          if (firstDateOfGantt.getTime() <= offDate.end.getTime() && offDate.end.getTime() <= nextDateOfFirstDateOfGantt.getTime()) {
+          if (
+            firstDateOfGantt.getTime() <= offDate.end.getTime() &&
+            offDate.end.getTime() <= nextDateOfFirstDateOfGantt.getTime()
+          ) {
             const startOfFirstDateOfGanttMs = firstDateOfGantt.getTime();
-            const endOfFirstDateOfGanttMs = nextDateOfFirstDateOfGantt.getTime();
-            const taskWidthParams = calcTaskWidthParams(startOfFirstDateOfGanttMs, endOfFirstDateOfGanttMs, offDate,
-              columnWidth, countDateSameAsFirstDateOfGantt, totalMsInOneDay, columnWidthViewModeFactor);
+            const endOfFirstDateOfGanttMs =
+              nextDateOfFirstDateOfGantt.getTime();
+            const taskWidthParams = calcTaskWidthParams(
+              startOfFirstDateOfGanttMs,
+              endOfFirstDateOfGanttMs,
+              offDate,
+              columnWidth,
+              countDateSameAsFirstDateOfGantt,
+              totalMsInOneDay,
+              columnWidthViewModeFactor
+            );
 
             overtimeOffDatesRect.push(
               <rect
                 key={"overtimeTemp" + i + " - " + j}
                 x={taskWidthParams.toAddTickX}
                 y={yWcIdMap[`WC${offDate.wcId!!}`].y}
-                width={(columnWidth * countDateSameAsFirstDateOfGantt) - taskWidthParams.freeWidth}
+                width={
+                  columnWidth * countDateSameAsFirstDateOfGantt -
+                  taskWidthParams.freeWidth
+                }
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={overtimeColor}
               />
-            )
+            );
           }
         }
       } else {
         // rtl
-        if (viewMode === "Hour" &&
+        if (
+          viewMode === "Hour" &&
           offDate.type === "overtime" &&
           dates[i].getDate() === dates[dates.length - 1].getDate() &&
           dates[i].getMonth() === dates[dates.length - 1].getMonth() &&
-          dates[i].getFullYear() === dates[dates.length - 1].getFullYear()) {
-
+          dates[i].getFullYear() === dates[dates.length - 1].getFullYear()
+        ) {
           const firstDateOfGantt = dates[dates.length - 1];
-          const countDateSameAsFirstDateOfGantt = dates.filter((it) =>
-            it.getDate() === firstDateOfGantt.getDate() &&
-            it.getMonth() === firstDateOfGantt.getMonth() &&
-            it.getFullYear() === firstDateOfGantt.getFullYear()).length;
-          const nextDateOfFirstDateOfGantt = dates[dates.length - 1 - countDateSameAsFirstDateOfGantt];
+          const countDateSameAsFirstDateOfGantt = dates.filter(
+            it =>
+              it.getDate() === firstDateOfGantt.getDate() &&
+              it.getMonth() === firstDateOfGantt.getMonth() &&
+              it.getFullYear() === firstDateOfGantt.getFullYear()
+          ).length;
+          const nextDateOfFirstDateOfGantt =
+            dates[dates.length - 1 - countDateSameAsFirstDateOfGantt];
 
-          if (firstDateOfGantt.getTime() <= offDate.end.getTime() && offDate.end.getTime() <= nextDateOfFirstDateOfGantt.getTime()) {
+          if (
+            firstDateOfGantt.getTime() <= offDate.end.getTime() &&
+            offDate.end.getTime() <= nextDateOfFirstDateOfGantt.getTime()
+          ) {
             const startOfFirstDateOfGanttMs = firstDateOfGantt.getTime();
-            const endOfFirstDateOfGanttMs = nextDateOfFirstDateOfGantt.getTime();
-            const taskWidthParams = calcTaskWidthParams(startOfFirstDateOfGanttMs, endOfFirstDateOfGanttMs, offDate,
-              columnWidth, countDateSameAsFirstDateOfGantt, totalMsInOneDay, columnWidthViewModeFactor);
+            const endOfFirstDateOfGanttMs =
+              nextDateOfFirstDateOfGantt.getTime();
+            const taskWidthParams = calcTaskWidthParams(
+              startOfFirstDateOfGanttMs,
+              endOfFirstDateOfGanttMs,
+              offDate,
+              columnWidth,
+              countDateSameAsFirstDateOfGantt,
+              totalMsInOneDay,
+              columnWidthViewModeFactor
+            );
 
             overtimeOffDatesRect.push(
               <rect
                 key={"overtimeTemp" + i + " - " + j}
-                x={(columnWidth * dates.length) - taskWidthParams.toAddTickX - taskWidthParams.taskWidth}
+                x={
+                  columnWidth * dates.length -
+                  taskWidthParams.toAddTickX -
+                  taskWidthParams.taskWidth
+                }
                 y={yWcIdMap[`WC${offDate.wcId!!}`].y}
-                width={(columnWidth * countDateSameAsFirstDateOfGantt) - taskWidthParams.freeWidth}
+                width={
+                  columnWidth * countDateSameAsFirstDateOfGantt -
+                  taskWidthParams.freeWidth
+                }
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={overtimeColor}
               />
-            )
+            );
           }
         }
       }
@@ -279,7 +331,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={y}
                 fill={holidayColor}
               />
-            )
+            );
             break;
           case "overtime":
             overtimeOffDatesRect.push(
@@ -291,7 +343,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={overtimeColor}
               />
-            )
+            );
             break;
           case "plannedDownTime":
             plannedDowntimeOffDatesRect.push(
@@ -303,7 +355,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={plannedDownTimeColor}
               />
-            )
+            );
             break;
           case "wcOverlap":
             wcOverlapOffDatesRect.push(
@@ -315,7 +367,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={wcOverlapColor}
               />
-            )
+            );
             break;
         }
       }
@@ -337,7 +389,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={y}
                 fill={holidayColor}
               />
-            )
+            );
             break;
           case "overtime":
             overtimeOffDatesRect.push(
@@ -349,7 +401,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={overtimeColor}
               />
-            )
+            );
             break;
           case "plannedDownTime":
             plannedDowntimeOffDatesRect.push(
@@ -361,7 +413,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={plannedDownTimeColor}
               />
-            )
+            );
             break;
           case "wcOverlap":
             wcOverlapOffDatesRect.push(
@@ -373,7 +425,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
                 height={yWcIdMap[`WC${offDate.wcId!!}`].height}
                 fill={wcOverlapColor}
               />
-            )
+            );
             break;
         }
       }
@@ -387,7 +439,7 @@ export const GridBody: React.FC<GridBodyProps> = ({
     ...holidayOffDatesRect,
     ...plannedDowntimeOffDatesRect,
     ...wcOverlapOffDatesRect,
-  ]
+  ];
 
   return (
     <g className="gridBody">
@@ -415,18 +467,28 @@ const calcTaskWidthParams = (
   const offEndMsTemp = offDate.end.getTime();
   const taskMsTemp = offEndMsTemp - offStartMsTemp;
 
-  const overflowTaskMsTemp = taskMsTemp > partialDayMs ? taskMsTemp - partialDayMs : 0;
+  const overflowTaskMsTemp =
+    taskMsTemp > partialDayMs ? taskMsTemp - partialDayMs : 0;
   const clippedTaskMsTemp = taskMsTemp - overflowTaskMsTemp;
 
   const freeMsTemp = partialDayMs - clippedTaskMsTemp;
-  const freeWidthTemp = (freeMsTemp / partialDayMs) * (columnWidth * countDateSameAsFirstDateOfGantt);
-  const startToOffStartMsInOneDayTemp = offStartMsTemp <= startOfFirstDateOfGanttMs ? 0 : offStartMsTemp - startOfFirstDateOfGanttMs;
-  const toAddTickXTemp = (startToOffStartMsInOneDayTemp / totalMsInOneDay) * columnWidthViewModeFactor;
-  const taskWidthTemp = (clippedTaskMsTemp / partialDayMs) * (columnWidth * countDateSameAsFirstDateOfGantt);
+  const freeWidthTemp =
+    (freeMsTemp / partialDayMs) *
+    (columnWidth * countDateSameAsFirstDateOfGantt);
+  const startToOffStartMsInOneDayTemp =
+    offStartMsTemp <= startOfFirstDateOfGanttMs
+      ? 0
+      : offStartMsTemp - startOfFirstDateOfGanttMs;
+  const toAddTickXTemp =
+    (startToOffStartMsInOneDayTemp / totalMsInOneDay) *
+    columnWidthViewModeFactor;
+  const taskWidthTemp =
+    (clippedTaskMsTemp / partialDayMs) *
+    (columnWidth * countDateSameAsFirstDateOfGantt);
 
   return {
     freeWidth: freeWidthTemp,
     toAddTickX: toAddTickXTemp,
     taskWidth: taskWidthTemp,
-  }
-}
+  };
+};

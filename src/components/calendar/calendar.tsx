@@ -162,10 +162,11 @@ export const Calendar: React.FC<CalendarProps> = ({
             xText={
               columnWidth * (i + 1) -
               getDaysInMonth(date.getMonth(), date.getFullYear()) *
-                columnWidth *
-                0.5
+                columnWidth +
+              columnWidth / 4
             }
             yText={topDefaultHeight * 0.9}
+            textAnchorToStart
           />
         );
       }
@@ -196,12 +197,14 @@ export const Calendar: React.FC<CalendarProps> = ({
           {bottomValue}
         </text>
       );
+
       if (i === 0 || date.getDate() !== dates[i - 1].getDate()) {
         const topValue = `${getLocalDayOfWeek(
           date,
           locale,
           "short"
         )}, ${date.getDate()} ${getLocaleMonth(date, locale)}`;
+
         topValues.push(
           <TopPartOfCalendar
             key={topValue + date.getFullYear()}
@@ -256,7 +259,7 @@ export const Calendar: React.FC<CalendarProps> = ({
             x1Line={columnWidth * (i + 1)}
             y1Line={0}
             y2Line={topDefaultHeight}
-            xText={(columnWidth * (i + 1)) - 720}
+            xText={columnWidth * (i + 1) - 720}
             yText={topDefaultHeight * 0.9}
           />
         );

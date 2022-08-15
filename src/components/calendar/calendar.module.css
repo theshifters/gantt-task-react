@@ -13,6 +13,17 @@
   stroke: #e6e4e4;
 }
 
+.calendarTopTextAnchorToStart {
+  text-anchor: start;
+  fill: #555;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
 .calendarTopText {
   text-anchor: middle;
   fill: #555;

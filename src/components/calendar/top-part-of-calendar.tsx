@@ -8,6 +8,7 @@ type TopPartOfCalendarProps = {
   y2Line: number;
   xText: number;
   yText: number;
+  textAnchorToStart?: boolean;
 };
 
 export const TopPartOfCalendar: React.FC<TopPartOfCalendarProps> = ({
@@ -17,6 +18,7 @@ export const TopPartOfCalendar: React.FC<TopPartOfCalendarProps> = ({
   y2Line,
   xText,
   yText,
+  textAnchorToStart,
 }) => {
   return (
     <g className="calendarTop">
@@ -32,7 +34,11 @@ export const TopPartOfCalendar: React.FC<TopPartOfCalendarProps> = ({
         key={value + "text"}
         y={yText}
         x={xText}
-        className={styles.calendarTopText}
+        className={
+          textAnchorToStart
+            ? styles.calendarTopTextAnchorStart
+            : styles.calendarTopText
+        }
       >
         {value}
       </text>

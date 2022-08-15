@@ -9,7 +9,7 @@ import styles from "./bar.module.css";
 export const Bar: React.FC<TaskItemProps> = ({
   task,
   isProgressChangeable,
-                                               isBarExpandable,
+  isBarExpandable,
   isDateChangeable,
   rtl,
   onEventStart,

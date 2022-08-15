@@ -30,6 +30,7 @@ export type TaskGanttContentProps = {
   setGanttEvent: (value: GanttEvent) => void;
   setFailedTask: (value: BarTask | null) => void;
   setSelectedTask: (taskId: string) => void;
+  overlapTasks: BarTask[];
 } & EventOption;
 
 export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
@@ -54,6 +55,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
   onProgressChange,
   onDoubleClick,
   onDelete,
+  overlapTasks,
 }) => {
   const point = svg?.current?.createSVGPoint();
   const [xStep, setXStep] = useState(0);
@@ -242,7 +244,7 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
         svg.current.getScreenCTM()?.inverse()
       );
       setInitEventX1Delta(cursor.x - task.x1);
-      setInitEventXCap1Delta(cursor.x - task.xCap1),
+      setInitEventXCap1Delta(cursor.x - task.xCap1);
       setGanttEvent({
         action,
         changedTask: task,
@@ -283,7 +285,9 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
               task={task}
               arrowIndent={arrowIndent}
               taskHeight={taskHeight}
-              isProgressChangeable={!!onProgressChange && !task.isDisabled}
+              isProgressChangeable={
+                !!onProgressChange && !task.isDisabled && !!task.isBarExpandable
+              }
               isBarExpandable={!!task.isBarExpandable}
               isDateChangeable={!!onDateChange && !task.isDisabled}
               isDelete={!task.isDisabled}
@@ -291,6 +295,12 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
               key={task.id}
               isSelected={!!selectedTask && task.id === selectedTask.id}
               rtl={rtl}
+              childTasks={
+                task.type === "project"
+                  ? tasks.filter(it => it.project === task.id)
+                  : undefined
+              }
+              overlapTasks={overlapTasks}
             />
           );
         })}

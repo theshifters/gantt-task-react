@@ -22,6 +22,8 @@ export type TaskItemProps = {
     selectedTask: BarTask,
     event?: React.MouseEvent | React.KeyboardEvent
   ) => any;
+  childTasks?: BarTask[];
+  overlapTasks: BarTask[];
 };
 
 export const TaskItem: React.FC<TaskItemProps> = props => {
@@ -116,7 +118,7 @@ export const TaskItem: React.FC<TaskItemProps> = props => {
         }
         ref={textRef}
       >
-        {task.name}
+        {task.name} {task.productLabel}
       </text>
     </g>
   );
